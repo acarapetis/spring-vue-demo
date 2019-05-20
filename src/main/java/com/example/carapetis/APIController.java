@@ -31,6 +31,12 @@ public class APIController {
     @Autowired PersonRepository personRepo;
     @Autowired LoanRepository loanRepo;
 
+    /*
+     * Seed the database with random data.
+     * 
+     * @TODO: This doesn't really belong in this class; in a real project it
+     * would live in a separate service-y bean.
+     */
     @EventListener(ApplicationReadyEvent.class)
 	private void seedDatabase() {
         Random random = new Random();
