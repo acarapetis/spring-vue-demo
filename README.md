@@ -8,7 +8,8 @@ Definitely does not work in Internet Explorer. (See
 ## Running
 
 If you have OpenJDK 8 and maven installed, all you should need to do is clone
-this repository and run `mvn spring-boot:run`.
+this repository and run `mvn spring-boot:run`, and (after dependency installation
+and compilation) the web application will be available at http://localhost:8080/.
 
 (A note to those that requested this: I tried briefly to get this to run using
 the basic jetty maven plugin, but had no luck configuring it quickly and didn't
