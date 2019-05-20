@@ -32,7 +32,7 @@ public class APIController {
     @Autowired LoanRepository loanRepo;
 
     @EventListener(ApplicationReadyEvent.class)
-	private void seedDatabase() {
+    private void seedDatabase() {
         Random random = new Random();
         for (int i = 0; i < 200; i++) {
             bookRepo.save(Book.fake());
@@ -47,7 +47,7 @@ public class APIController {
             }
             personRepo.save(person);
         }
-	}
+    }
 
     // I've used JsonViews to control whether collections of children are serialized.
     // The Simple view does not serialize any children.
