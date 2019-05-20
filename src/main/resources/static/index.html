@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Library Demo</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+        <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css">
+        <script src="//unpkg.com/vue@latest/dist/vue.js"></script>
+
+        <!-- bootstrap-vue to avoid reimplementing b-tabs, b-pagination: -->
+        <script src="//polyfill.io/v3/polyfill.min.js?features=es2015%2CMutationObserver" crossorigin="anonymous"></script>
+        <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css">
+
+        <!-- vue-async-computed to allow AJAX calls as computed props -->
+        <script src="//unpkg.com/vue-async-computed"></script>
+        <style>
+            .tab-table > thead > tr > th {
+                border-top: none;
+            }
+
+            tr.loans {
+                background: #f9f9f9;
+            }
+
+            .spinner-overlay {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position: absolute; 
+                top: 0; 
+                left: 0; 
+                width: 100%; 
+                height: 100%;
+                background: rgba(255,255,255,0.5)
+            }
+
+            /* stop buttons from stretching rows */
+            td > button.btn-sm {
+                margin: -8px 0 -4px 0;
+            }
+
+            /* don't render extra-thick rules between our custom tbodys */
+            .table tbody.person-row+tbody.person-row {
+                border-top-width: 1px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row mt-3">
+                <h1 class="display-1">Library Demo</h1>
+            </div>
+            <div id="app" class="row mt-3">
+                <b-card no-body class="w-100">
+                    <b-tabs card>
+                        <b-tab title="People" active no-body class="position-relative">
+                            <div v-if="$asyncComputed.people.updating" class="spinner-overlay">
+                                <div class="spinner-border my-3" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
+                            <table id="people" class="table tab-table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>id</th>
+                                        <th>Name</th>
+                                        <th>Address</th>
+                                        <th>Phone</th>
+                                    </tr>
+                                </thead>
+                                <tbody is="person-row" v-for="person in people" :person="person" :key="person.id"></tbody>
+                            </table>
+                            <b-pagination v-model="peoplePage"
+                                :total-rows="peopleTotal"
+                                :per-page="pageSize"
+                                class="justify-content-center"
+                            ></b-pagination>
+                        </b-tab>
+                        <b-tab title="Books" no-body>
+                            <div v-if="$asyncComputed.books.updating" class="spinner-overlay">
+                                <div class="spinner-border my-3" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
+                            <table id="books" class="table tab-table">
+                                <thead>
+                                    <tr>
+                                        <th>id</th>
+                                        <th>ISBN</th>
+                                        <th>Author</th>
+                                        <th>Title</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="book in books" :key="book.id">
+                                        <td>{{ book.id }}</td>
+                                        <td>{{ book.ISBN }}</td>
+                                        <td>{{ book.author }}</td>
+                                        <td>{{ book.title }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <b-pagination v-model="bookPage"
+                                :total-rows="bookTotal"
+                                :per-page="pageSize"
+                                class="justify-content-center"
+                            ></b-pagination>
+                        </b-tab>
+                    </b-tabs>
+                </b-card>
+            </div>
+        </div>
+        <script>
+            Vue.component('person-row', {
+                props: {
+                    person: { default: {} },
+                },
+                data: function() {
+                    return {
+                        expanded: false,
+                    }
+                },
+                methods: {
+                    toggle: function() {
+                        this.expanded = !this.expanded;
+                    }
+                },
+                asyncComputed: {
+                    loanedBooks: {
+                        lazy: true,
+                        get: function() {
+                            return fetch(`/api/people/${this.person.id}`)
+                                .then(r => r.json())
+                                .then(person => person.loans.map(l => l.book));
+                        }
+                    }
+                },
+                template: `
+                    <tbody class="person-row">
+                        <tr>
+                            <td>
+                                <button type="button" 
+                                        :class="{ btn: true, 'btn-info': true, 'btn-sm': true, active: expanded }" 
+                                        @click="toggle">
+                                    {{ expanded ? 'Hide' : 'Show' }} Loans
+                                </button>
+                            </td>
+                            <td>{{ person.id }}</td>
+                            <td>{{ person.name }}</td>
+                            <td>{{ person.address }}</td>
+                            <td>{{ person.phone }}</td>
+                        </tr>
+                        <tr :class="{ loans: true, collapse: true, show: expanded }">
+                            <td colspan=5>
+                                <template v-if="expanded">
+                                    <template v-if="loanedBooks">
+                                        <h5>{{ loanedBooks.length ? 'Books' : 'No books'}} borrowed by {{person.name}}</h5>
+                                        <table v-if="loanedBooks.length" class="table table-sm mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>id</th>
+                                                    <th>ISBN</th>
+                                                    <th>Author</th>
+                                                    <th>Title</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="book in loanedBooks" :key="book.id">
+                                                    <td>{{ book.id }}</td>
+                                                    <td>{{ book.ISBN }}</td>
+                                                    <td>{{ book.author }}</td>
+                                                    <td>{{ book.title }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </template>
+                                    <template v-else>
+                                        <div class="spinner-border" role="status">
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                    </template>
+                                </template>
+                            </td>
+                        </tr>
+                    </tbody>
+                `
+            })
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    peoplePage: 1,
+                    peopleTotal: 0,
+                    bookPage: 1,
+                    bookTotal: 0,
+                    pageSize: 10,
+                },
+                asyncComputed: {
+                    people: function() {
+                        // If we wanted to support IE11, then fetch,
+                        // `template-strings`, arrow functions are off the
+                        // table; so we'd either have to replace them (e.g. with
+                        // XMLHttpRequest, string concatenation, anonymous
+                        // functions) or use a transpiler. 
+                        // Would probably also need a Promise polyfill for
+                        // asyncComputed?
+                        let url = `/api/people?page=${this.peoplePage-1}&size=${this.pageSize}`
+                        return fetch(url).then(r => r.json()).then(data => {
+                            this.peopleTotal = data.totalElements;
+                            return data.content;
+                        })
+                    },
+                    books: function() {
+                        let url = `/api/books?page=${this.bookPage-1}&size=${this.pageSize}`
+                        return fetch(url).then(r => r.json()).then(data => {
+                            this.bookTotal = data.totalElements;
+                            return data.content;
+                        })
+                    }
+                },
+            });
+        </script>
+    </body>
+</html>
