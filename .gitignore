@@ -1,6 +1,14 @@
 HELP.md
-/target/
-!.mvn/wrapper/maven-wrapper.jar
+/target
+
+# vim
+*.swp
+*~
+
+# Don't include maven wrapper
+.mvn/
+mvnw
+mvnw.cmd
 
 ### STS ###
 .apt_generated
