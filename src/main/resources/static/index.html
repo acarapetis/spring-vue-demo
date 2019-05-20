@@ -140,6 +140,10 @@
              * Since Vue components must have a single top-level element, we
              * can't have this component consist of two <tr>s. Thankfully, we
              * can put multiple <tbody>s in a table.
+             *
+             * If we were using a bundler, we'd also get to take advantage of
+             * writing components as .vue files instead of the somewhat clumsy
+             * inline template used here.
              */
             Vue.component('person-row', {
                 props: {
