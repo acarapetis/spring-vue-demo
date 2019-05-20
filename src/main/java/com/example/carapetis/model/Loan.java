@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
 public class Loan {
+    // Serialization of this loan's book and person can be controlled by using
+    // one of the following views (or a view extending them).
     public static interface ShowBook extends Simple {}
     public static interface ShowPerson extends Simple {}
     public static interface Detailed extends ShowBook, ShowPerson {}

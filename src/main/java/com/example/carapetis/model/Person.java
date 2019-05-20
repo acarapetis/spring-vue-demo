@@ -25,6 +25,8 @@ public class Person {
     @Column
     public Long id;
 
+    // Columns without any JsonView annotation are shown in all views, so we
+    // don't have to put Simple annotations everywhere.
     @Column(nullable = false)
     public String name;
 
@@ -34,6 +36,7 @@ public class Person {
     @Column(nullable = true)
     public String phone;
 
+    // If we're serialized in the Person.Detailed view, include all our loans.
     @JsonView(Detailed.class)
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     public Set<Loan> loans = new HashSet<>();
