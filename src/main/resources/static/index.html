@@ -6,6 +6,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 
+        <!-- In production we'd want to pin versions of all these scripts & stylesheets,
+            or tree-shake and bundle just the bits we need instead of using CDNs. -->
         <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css">
         <script src="//unpkg.com/vue@latest/dist/vue.js"></script>
 
@@ -16,6 +18,8 @@
 
         <!-- vue-async-computed to allow AJAX calls as computed props -->
         <script src="//unpkg.com/vue-async-computed"></script>
+        
+        <!-- can't help but tweak the look a bit-->
         <style>
             .tab-table > thead > tr > th {
                 border-top: none;
@@ -115,6 +119,28 @@
             </div>
         </div>
         <script>
+            /* 
+             * I've used some modern JavaScript features that are not supported
+             * in old browsers (or, to paraphrase Microsoft, "not browsers;
+             * compatibility tools") like IE11, for example:
+             *  - Arrow functions
+             *  - Template string literals
+             *  - Promises
+             *  - the Fetch API
+             * If this was a production site that needed to run in IE11, we
+             * would need a JS build system set up to transpile and polyfill
+             * these features.
+             */
+
+            /* 
+             * <person-row>: a table row displaying the details of a person,
+             * with a button to slide out an additional row with details of
+             * their loans.
+             * 
+             * Since Vue components must have a single top-level element, we
+             * can't have this component consist of two <tr>s. Thankfully, we
+             * can put multiple <tbody>s in a table.
+             */
             Vue.component('person-row', {
                 props: {
                     person: { default: {} },

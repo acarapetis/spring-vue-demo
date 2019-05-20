@@ -49,6 +49,8 @@ public class APIController {
         }
 	}
 
+    // I've used JsonViews to control whether collections of children are serialized.
+    // The Simple view does not serialize any children.
     @JsonView(Simple.class)
     @GetMapping("/books")
     public Page<Book> listBooks(@RequestParam(defaultValue="0") Integer page, 
@@ -67,6 +69,8 @@ public class APIController {
         return personRepo.findAll(paging);
     }
 
+    // Person.Detailed serializes people.loans[].book.
+    // See model/Person.java for the definition.
     @JsonView(Person.Detailed.class)
     @GetMapping("/people/{id}")
     public Person getPerson(@PathVariable Long id) {
