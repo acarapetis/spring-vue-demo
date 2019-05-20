@@ -8,3 +8,8 @@ Definitely does not work in Internet Explorer. (See
 ## Running
 
 If you have maven installed, all you need to do is run `mvn spring-boot:run`.
+
+(A note to those that requested this: I tried briefly to get this to run using
+the basic jetty maven plugin, but had no luck configuring it quickly and didn't
+want to spend too much more time. I hope the spring-boot-starter-jetty plugin
+is acceptable.)
