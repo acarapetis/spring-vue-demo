@@ -230,13 +230,6 @@
                 },
                 asyncComputed: {
                     people: function() {
-                        // If we wanted to support IE11, then fetch,
-                        // `template-strings`, arrow functions are off the
-                        // table; so we'd either have to replace them (e.g. with
-                        // XMLHttpRequest, string concatenation, anonymous
-                        // functions) or use a transpiler. 
-                        // Would probably also need a Promise polyfill for
-                        // asyncComputed?
                         let url = `/api/people?page=${this.peoplePage-1}&size=${this.pageSize}`
                         return fetch(url).then(r => r.json()).then(data => {
                             this.peopleTotal = data.totalElements;
